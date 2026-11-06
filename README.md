@@ -25,12 +25,12 @@ troubleshooting, and updates.
 ```mermaid
 flowchart LR
     A[GitHub v5 branch] --> B[Railway Docker build]
-    B --> C[/app container]
-    C --> D[Headless Patchright Chromium]
-    C --> E[Cron scheduler]
-    C --> F[Optional Discord bot]
-    G[(Railway volume /app/config)] --> C
-    H[Microsoft sessions] --> G
+    B --> C["/app container"]
+    C --> D["Headless Patchright Chromium"]
+    C --> E["Cron scheduler"]
+    C --> F["Optional Discord bot"]
+    G[("Railway volume /app/config")] --> C
+    H["Microsoft sessions"] --> G
 ```
 
 ### Railway quick start
