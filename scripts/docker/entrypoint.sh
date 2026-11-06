@@ -2,11 +2,11 @@
 set -euo pipefail
 
 export PLAYWRIGHT_BROWSERS_PATH=0
-SCRIPT_DIR="/usr/src/microsoft-rewards-script"
+SCRIPT_DIR="/app"
 cd "$SCRIPT_DIR"
 source "$SCRIPT_DIR/scripts/lib/dockerLog.sh"
 
-: "${TZ:=UTC}"
+: "${TZ:=Asia/Kathmandu}"
 export TZ
 if [ ! -f "/usr/share/zoneinfo/$TZ" ]; then
     echo "ERROR: Unknown timezone: $TZ" >&2
@@ -32,6 +32,13 @@ else
 fi
 
 CONFIG_FILE="$SCRIPT_DIR/config/config.json"
+mkdir -p "$SCRIPT_DIR/config/sessions" "$SCRIPT_DIR/config/diagnostics"
+if [ ! -e "$SCRIPT_DIR/sessions" ] && [ ! -L "$SCRIPT_DIR/sessions" ]; then
+    ln -s "$SCRIPT_DIR/config/sessions" "$SCRIPT_DIR/sessions"
+fi
+if [ ! -e "$SCRIPT_DIR/diagnostics" ] && [ ! -L "$SCRIPT_DIR/diagnostics" ]; then
+    ln -s "$SCRIPT_DIR/config/diagnostics" "$SCRIPT_DIR/diagnostics"
+fi
 if [ -d "$CONFIG_FILE" ]; then
     echo "ERROR: $CONFIG_FILE is a directory. Replace it with a config.json file." >&2
     exit 1
@@ -56,6 +63,10 @@ if [ "${API_MODE:-false}" = "true" ]; then
     export API_HOST
     docker_log_command entrypoint info node dist/control-api/apply-schedule.js
 else
+    if [ -n "${DISCORD_BOT_TOKEN:-}" ]; then
+        docker_log entrypoint error 'ERROR: DISCORD_BOT_TOKEN requires API_MODE=true.'
+        exit 1
+    fi
     if [ -z "${CRON_SCHEDULE:-}" ]; then
         docker_log entrypoint error 'ERROR: Set CRON_SCHEDULE (e.g. "0 7 * * *"), or API_MODE=true for the Control API.'
         exit 1
@@ -114,6 +125,11 @@ if [ "${API_MODE:-false}" = "true" ]; then
     docker_log entrypoint info "[entrypoint] Starting Control API on ${API_HOST}:${API_PORT:-3010}"
     node dist/control-api/server.js &
     service_pids+=("$!")
+    if [ -n "${DISCORD_BOT_TOKEN:-}" ]; then
+        docker_log entrypoint info '[entrypoint] Starting Discord control bot'
+        node scripts/discord/bot.js &
+        service_pids+=("$!")
+    fi
     docker_log_flush
     export -p > /etc/container_env
     chmod 600 /etc/container_env

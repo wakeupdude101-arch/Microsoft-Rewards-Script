@@ -14,9 +14,9 @@ fi
 unset _SKIP_SLEEP_OVERRIDE
 
 export PLAYWRIGHT_BROWSERS_PATH=0
-export TZ="${TZ:-UTC}"
+export TZ="${TZ:-Asia/Kathmandu}"
 
-cd /usr/src/microsoft-rewards-script
+cd /app
 source scripts/lib/dockerLog.sh
 docker_log_flush
 

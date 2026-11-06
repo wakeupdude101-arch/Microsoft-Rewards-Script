@@ -7,15 +7,15 @@ services:
         restart: unless-stopped
         stop_grace_period: 60s
         volumes:
-            - ./config:/usr/src/microsoft-rewards-script/config
-            - ./diagnostics:/usr/src/microsoft-rewards-script/diagnostics
-            - ./sessions:/usr/src/microsoft-rewards-script/sessions
+            - ./config:/app/config
+            - ./diagnostics:/app/diagnostics
+            - ./sessions:/app/sessions
         env_file:
             # Load account credentials from the .env file (ACCOUNT_1_EMAIL, optional ACCOUNT_1_PASSWORD, etc.)
             - path: .env
         environment:
             # ── Scheduler ──────────────────────────────────────
-            TZ: 'America/Toronto'
+            TZ: 'Asia/Kathmandu'
             NODE_ENV: 'production'
             # CRON_SCHEDULE is the *initial* default. It will run as default unless changed by the API
             # API schedule changes are saved to ./config/schedule.json, delete

@@ -5,10 +5,44 @@
 [![Docker image (GHCR)](https://img.shields.io/badge/Docker-GHCR%20v5-2496ED?logo=docker&logoColor=white)](https://github.com/TheNetsky/Microsoft-Rewards-Script/pkgs/container/microsoft-rewards-script)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D24-green)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
+[![Railway](https://img.shields.io/badge/deploy-Railway-8B5CF6?logo=railway&logoColor=white)](RAILWAY.md)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/thenetsky)
 
-Microsoft Rewards automation with API and browser modes, saved sessions,
-multiple accounts, localised searches and an optional Control API.
+Headless Microsoft Rewards automation for Docker, Railway, and local execution.
+Supports browser and API task modes, saved sessions, multiple accounts,
+localized searches, scheduling, and an optional allowlisted Discord control bot.
+
+> **Important:** This project automates a third-party website. Use it only with
+> accounts you own and review Microsoft's current terms and policies before use.
+
+## Railway deployment
+
+The fastest production setup is documented in
+[RAILWAY.md](RAILWAY.md). It covers Docker deployment, headless Chromium,
+Railway volumes, scheduling, local authentication, Discord control, logs,
+troubleshooting, and updates.
+
+```mermaid
+flowchart LR
+    A[GitHub v5 branch] --> B[Railway Docker build]
+    B --> C[/app container]
+    C --> D[Headless Patchright Chromium]
+    C --> E[Cron scheduler]
+    C --> F[Optional Discord bot]
+    G[(Railway volume /app/config)] --> C
+    H[Microsoft sessions] --> G
+```
+
+### Railway quick start
+
+1. Deploy the repository's `Dockerfile` from branch `v5`.
+2. Attach one persistent volume at `/app/config`.
+3. Add `ACCOUNT_N_EMAIL` variables and scheduler variables.
+4. Complete manual authentication locally and transfer sessions securely.
+5. Optionally enable the private Control API and Discord bot.
+
+See the [complete Railway guide](RAILWAY.md) before deploying. Never commit
+`.env`, passwords, TOTP secrets, cookies, tokens, or session files.
 
 ## Features
 
@@ -18,6 +52,8 @@ multiple accounts, localised searches and an optional Control API.
 - Streak progress, API-based streak protection and verified point reporting.
 - Scheduled runs, account selection, saved sessions and Discord/Telegram/ntfy notifications.
 - Control API with live events, persistent history, punchcard progress and activity balance observations.
+- Optional Discord slash commands for status, sanitized logs, account listing,
+  manual runs, and confirmation-gated schedule changes.
 
 Activities depend on the account and region. This branch contains v5; earlier
 versions remain available on [v3](https://github.com/TheNetsky/Microsoft-Rewards-Script/tree/v3)
@@ -27,6 +63,7 @@ and [v4](https://github.com/TheNetsky/Microsoft-Rewards-Script/tree/v4).
 
 - [Setup and usage](docs/usage.md) — local, Nix and Docker installation, accounts, settings, commands and troubleshooting.
 - [Control API](docs/control-api.md) — authentication, endpoints, run control, scheduling and dashboard data.
+- [Railway deployment](RAILWAY.md) — production Docker deployment, volumes, secrets, authentication, scheduling and Discord.
 
 ## Setup
 
