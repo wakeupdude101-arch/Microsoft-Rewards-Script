@@ -189,6 +189,8 @@ Manual login requires a graphical computer and is intentionally not forced
 headless:
 
 ```bash
+git clone --branch v5 https://github.com/wakeupdude101-arch/Microsoft-Rewards-Script.git
+cd Microsoft-Rewards-Script
 cp env.example .env
 # Add ACCOUNT_N_EMAIL and any local-only sign-in settings to .env
 npm ci

@@ -70,6 +70,8 @@ and [v4](https://github.com/TheNetsky/Microsoft-Rewards-Script/tree/v4).
 Requires Node.js 24 or newer.
 
 ```sh
+git clone --branch v5 https://github.com/wakeupdude101-arch/Microsoft-Rewards-Script.git
+cd Microsoft-Rewards-Script
 npm ci
 npm run install:browser
 npm run build
