@@ -107,6 +107,18 @@ DISCORD_ALLOWED_USER_IDS=<comma-separated Discord user IDs>
 API_ALLOW_SCHEDULE_WRITE=true
 ```
 
+Invite the application with this URL after replacing the placeholders:
+
+```text
+https://discord.com/oauth2/authorize?client_id=DISCORD_APPLICATION_ID&scope=bot%20applications.commands&permissions=0
+```
+
+The application must be invited to the same server whose ID is in
+`DISCORD_GUILD_ID`. If logs say `Missing Access`, the bot is not in that
+server, the application ID is wrong, or it was invited without the
+`applications.commands` scope. The bot now reports this clearly and retries
+registration instead of crashing the Railway container.
+
 The bot registers `/status`, `/logs`, `/accounts`, `/run`, and
 `/schedule view|set|disable`. Mutating commands require `confirm=true`.
 `/accounts` exposes email addresses only. It never accepts or changes account
@@ -143,8 +155,10 @@ interactive for local use. They are not used by the Railway scheduler.
 
 ## 5. Persistent volume
 
-Railway currently supports one persistent volume per service. Mount that
-volume at:
+In the current Railway dashboard, create a **Volume** from the project canvas:
+right-click an empty area and choose **Create Volume**, or use **Ctrl/Cmd+K**
+and search for **New Volume**. Connect the volume to the Microsoft Rewards
+service, then open the volume's **Mount Path** setting and enter:
 
 ```text
 /app/config

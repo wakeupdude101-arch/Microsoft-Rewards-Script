@@ -130,11 +130,28 @@ async function handle(interaction) {
 }
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
-client.once('ready', async readyClient => {
+async function registerCommands(readyClient) {
     const rest = new REST({ version: '10' }).setToken(token)
-    await rest.put(Routes.applicationGuildCommands(applicationId, guildId), { body: commands })
-    console.log(`[discord] Logged in as ${readyClient.user.tag}; commands registered for guild ${guildId}`)
-})
+    try {
+        await rest.put(Routes.applicationGuildCommands(applicationId, guildId), { body: commands })
+        console.log(`[discord] Logged in as ${readyClient.user.tag}; commands registered for guild ${guildId}`)
+    } catch (error) {
+        if (error?.code === 50001 || error?.status === 403) {
+            console.error(
+                `[discord] Cannot register commands for guild ${guildId}. ` +
+                    `Invite this application to that server with the "bot" and "applications.commands" scopes, ` +
+                    `then verify DISCORD_APPLICATION_ID and DISCORD_GUILD_ID. Retrying in 60 seconds.`
+            )
+        } else {
+            console.error(
+                `[discord] Command registration failed: ${sanitize(error instanceof Error ? error.message : String(error))}`
+            )
+        }
+        setTimeout(() => void registerCommands(readyClient), 60_000).unref()
+    }
+}
+client.once('clientReady', readyClient => void registerCommands(readyClient))
+client.on('error', error => console.error(`[discord] Client error: ${sanitize(error.message)}`))
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return
     try {
@@ -146,4 +163,7 @@ client.on('interactionCreate', async interaction => {
         else await interaction.reply({ content: `Error: ${message}`, ephemeral: true })
     }
 })
-client.login(token)
+client.login(token).catch(error => {
+    console.error(`[discord] Login failed: ${sanitize(error instanceof Error ? error.message : String(error))}`)
+    process.exitCode = 1
+})
